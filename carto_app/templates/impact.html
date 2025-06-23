@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Impact Serveur</title>
+</head>
+<body>
+    <h1>Analyse d'impact d'un serveur</h1>
+    <form method="get">
+        <label for="serveur">Sélectionnez un serveur :</label>
+        <select name="serveur_id" id="serveur" onchange="this.form.submit()">
+            <option value="">-- Choisissez --</option>
+            {% for srv in serveurs %}
+                <option value="{{ srv.id }}" {% if selected and selected.id == srv.id %}selected{% endif %}>{{ srv.nom }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected %}
+        <h2>Applications hébergées sur {{ selected.nom }}</h2>
+        <ul>
+        {% for app in applications %}
+            <li>{{ app.nom }} - {{ app.version }}</li>
+        {% endfor %}
+        </ul>
+
+        <h2>Bases de données hébergées</h2>
+        <ul>
+        {% for bdd in bdds %}
+            <li>{{ bdd.nom }} ({{ bdd.type }})</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Visualisation des services</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
+</head>
+<body>
+    <h1>Visualisation des applications par serveur</h1>
+
+    <label for="filtre-serveur">Filtrer par serveur :</label>
+    <select id="filtre-serveur">
+        <option value="">-- Tous les serveurs --</option>
+    </select>
+
+    <canvas id="treeCanvas" width="900" height="600"></canvas>
+
+    <script>
+        const selectServeur = document.getElementById("filtre-serveur");
+        const canvas = document.getElementById("treeCanvas");
+        let chart;
+
+        function chargerServeurs() {
+            fetch("/api/visualisation/")
+                .then(res => res.json())
+                .then(data => {
+                    const serveurs = new Set();
+                    data.forEach(item => serveurs.add(item.serveur));
+                    serveurs.forEach(nom => {
+                        const opt = document.createElement("option");
+                        opt.value = nom;
+                        opt.textContent = nom;
+                        selectServeur.appendChild(opt);
+                    });
+                });
+        }
+
+        function afficherDonnees(serveur = "") {
+            const url = serveur ? `/api/visualisation/?serveur=${serveur}` : "/api/visualisation/";
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const items = [];
+                    data.forEach(server => {
+                        server.applications.forEach(app => {
+                            items.push({
+                                label: `${server.serveur} > ${app.nom}`,
+                                value: 1,
+                                group: server.serveur,
+                                category: app.services.join(", ")
+                            });
+                        });
+                    });
+
+                    if (chart) chart.destroy();
+
+                    chart = new Chart(canvas, {
+                        type: "treemap",
+                        data: {
+                            datasets: [{
+                                tree: items,
+                                key: "value",
+                                groups: ["group"],
+                                label: "label",
+                                backgroundColor: "rgba(75, 192, 192, 0.5)",
+                                borderWidth: 1,
+                                borderColor: "#333"
+                            }]
+                        },
+                        options: {
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                });
+        }
+
+        selectServeur.addEventListener("change", () => {
+            afficherDonnees(selectServeur.value);
+        });
+
+        chargerServeurs();
+        afficherDonnees(); // chargement initial
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Requête SQL</title>
+</head>
+<body>
+    <h1>Interface SQL (lecture seule)</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="sql" rows="5" cols="100">{{ sql }}</textarea><br>
+        <button type="submit">Exécuter</button>
+    </form>
+
+    {% if error %}
+        <p style="color:red;">Erreur : {{ error }}</p>
+    {% endif %}
+
+    {% if headers %}
+        <table border="1" cellpadding="5">
+            <thead>
+                <tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for row in result %}
+                <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</body>
+</html>

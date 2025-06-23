@@ -1,0 +1,72 @@
+[
+  {
+    "model": "carto_app.serveur",
+    "pk": "00000000-0000-0000-0000-000000000001",
+    "fields": {
+      "nom": "Serveur-Alpha",
+      "type": "VM",
+      "environnement": "Production",
+      "os": "Ubuntu 22.04",
+      "cycle_vie": "Actif",
+      "localisation": "Rennes"
+    }
+  },
+  {
+    "model": "carto_app.serveur",
+    "pk": "00000000-0000-0000-0000-000000000002",
+    "fields": {
+      "nom": "Serveur-Beta",
+      "type": "Physique",
+      "environnement": "Pr\u00e9-prod",
+      "os": "Windows Server 2019",
+      "cycle_vie": "Maintenance",
+      "localisation": "Quimper"
+    }
+  },
+  {
+    "model": "carto_app.application",
+    "pk": "11111111-1111-1111-1111-111111111111",
+    "fields": {
+      "nom": "AppliGestion",
+      "version": "v2.4",
+      "cycle_vie": "Actif",
+      "type": "Web",
+      "serveur": "00000000-0000-0000-0000-000000000001",
+      "position_PLU": "Zone 3"
+    }
+  },
+  {
+    "model": "carto_app.application",
+    "pk": "11111111-1111-1111-1111-111111111112",
+    "fields": {
+      "nom": "AppliRH",
+      "version": "v1.8",
+      "cycle_vie": "Actif",
+      "type": "Desktop",
+      "serveur": "00000000-0000-0000-0000-000000000002",
+      "position_PLU": "Zone 1"
+    }
+  },
+  {
+    "model": "carto_app.basededonnees",
+    "pk": "22222222-2222-2222-2222-222222222222",
+    "fields": {
+      "nom": "BDD_RH",
+      "type": "PostgreSQL",
+      "version": "15",
+      "serveur": "00000000-0000-0000-0000-000000000002",
+      "application": "11111111-1111-1111-1111-111111111112"
+    }
+  },
+  {
+    "model": "carto_app.basededonnees",
+    "pk": "22222222-2222-2222-2222-222222222223",
+    "fields": {
+      "nom": "BDD_Gestion",
+      "type": "MySQL",
+      "version": "8.0",
+      "serveur": "00000000-0000-0000-0000-000000000001",
+      "application": "11111111-1111-1111-1111-111111111111"
+    }
+  }
+]

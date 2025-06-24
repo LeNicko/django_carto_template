@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from django.db import connection
-from .models import Serveur, Application, BaseDeDonnees
+from django.db import connection 
+from .models import Serveur, Application, BaseDeDonnees, ServiceMetier, AppServiceMetier
 from django.http import JsonResponse
-from .models import ServiceMetier, AppServiceMetier
 
 
 def impact_serveur(request):
@@ -81,3 +80,74 @@ def visualisation_data(request):
         })
 
     return JsonResponse(data, safe=False)
+
+def diagramme_applications(request):
+    data = []
+
+    liens = AppServiceMetier.objects.select_related("application", "service_metier")
+    for lien in liens:
+        data.append({
+            "application": lien.application.nom,
+            "service_metier": lien.service_metier.nom,
+            "serveur": lien.application.serveur.nom if lien.application.serveur else "Aucun serveur"
+        })
+
+    return render(request, "diagramme.html", {"data": data})
+
+def visualisation_arborescente(request):
+    services = ServiceMetier.objects.prefetch_related(
+        'appservicemetier_set__application__bases',
+        'appservicemetier_set__application__serveur'
+    )
+    return render(request, 'visualisation_arborescente.html', {'services': services})
+
+def data_hierarchique(request):
+    data = []
+
+    for service in ServiceMetier.objects.all():
+        service_data = {
+            "name": service.nom,
+            "children": []
+        }
+        apps = Application.objects.filter(appservicemetier__service_metier=service)
+        for app in apps:
+            app_data = {
+                "name": app.nom,
+                "children": []
+            }
+            bdds = BaseDeDonnees.objects.filter(application=app)
+            for bdd in bdds:
+                app_data["children"].append({
+                    "name": bdd.nom,
+                    "type": "Base de données",
+                    "serveur": bdd.serveur.nom if bdd.serveur else "Non attribué"
+                })
+            service_data["children"].append(app_data)
+        data.append(service_data)
+
+    return JsonResponse({"name": "Système d'information", "children": data})
+
+def vue_arbre(request):
+    return render(request, "arbre.html")
+
+def api_hierarchie(request):
+    def build_tree():
+        result = []
+        for service in ServiceMetier.objects.all():
+            service_node = {
+                "name": service.nom,
+                "children": []
+            }
+            for asm in service.appservicemetier_set.select_related('application'):
+                app = asm.application
+                app_node = {
+                    "name": app.nom,
+                    "children": []
+                }
+                if app.serveur:
+                    app_node["children"].append({"name": f"Serveur: {app.serveur.nom}"})
+                service_node["children"].append(app_node)
+            result.append(service_node)
+        return {"name": "Système d'information", "children": result}
+
+    return JsonResponse(build_tree())

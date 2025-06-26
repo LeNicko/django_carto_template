@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import impact_serveur, requete_sql, visualisation, visualisation_data , diagramme_applications
+from .views import impact_serveur, requete_sql, visualisation, visualisation_data , diagramme_applications, vue_arbre, api_hierarchie
 from . import views
 
 urlpatterns = [
